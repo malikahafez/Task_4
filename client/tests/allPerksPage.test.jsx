@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, getByText, screen, waitFor } from '@testing-library/react';
 import { Routes, Route } from 'react-router-dom';
 
 import AllPerks from '../src/pages/AllPerks.jsx';
@@ -52,6 +52,28 @@ describe('AllPerks page (Directory)', () => {
 
   test('lists public perks and responds to merchant filtering', async () => {
     // This will always fail until the TODO above is implemented.
-    expect(true).toBe(false);
+    // expect(true).toBe(false);
+    const seededPerk = global.__TEST_CONTEXT__.seededPerk;
+
+    renderWithRouter(
+    <Routes>
+    <Route path="/explore" element={<AllPerks />} />
+    </Routes>,
+    { initialEntries: ['/explore'] }
+    );
+
+    await waitFor(() => {
+    expect(screen.getByText(seededPerk.title)).toBeInTheDocument();
+    });
+    const merchantFilter = screen.getByText('All Merchants');
+    fireEvent.change(merchantFilter, { target: { value: seededPerk.merchant } });
+
+    await waitFor(() => {
+    expect(screen.getByText(seededPerk.title)).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/showing/i)).toHaveTextContent('Showing');
+    });
+
+
   });
-});
